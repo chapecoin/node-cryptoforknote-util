@@ -378,9 +378,9 @@ namespace cryptonote
     BEGIN_SERIALIZE()
       VARINT_FIELD(major_version)
       VARINT_FIELD(minor_version)
-      if (blob_type != BLOB_TYPE_FORKNOTE2) VARINT_FIELD(timestamp)
+      if (major_version == 1) VARINT_FIELD(timestamp)
       FIELD(prev_id)
-      if (blob_type != BLOB_TYPE_FORKNOTE2) FIELD(nonce)
+      if (major_version == 1) FIELD(nonce)
     END_SERIALIZE()
   };
 
@@ -395,7 +395,7 @@ namespace cryptonote
 
     BEGIN_SERIALIZE_OBJECT()
       FIELDS(*static_cast<block_header *>(this))
-      if (blob_type == BLOB_TYPE_FORKNOTE2)
+      if (major_version >= 2)
       {
         auto sbb = make_serializable_bytecoin_block(*this, false, false);
         FIELD_N("parent_block", sbb);
