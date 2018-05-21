@@ -29,7 +29,7 @@ blobdata uint64be_to_blob(uint64_t num) {
     res[7] = num       & 0xff;
     return res;
 }
-                                    
+
 static bool fillExtra(cryptonote::block& block1, const cryptonote::block& block2) {
     cryptonote::tx_extra_merge_mining_tag mm_tag;
     mm_tag.depth = 0;
@@ -59,8 +59,13 @@ static bool mergeBlocks(const cryptonote::block& block1, cryptonote::block& bloc
 }
 
 static bool construct_parent_block(const cryptonote::block& b, cryptonote::block& parent_block) {
+  if (b.major_version >= CURRENT_BLOCK_MAJOR_VERSION) {
+    parent_block.major_version = b.major_version;
+    parent_block.minor_version = 0;
+  } else {
     parent_block.major_version = 1;
     parent_block.minor_version = 0;
+  }
     parent_block.timestamp = b.timestamp;
     parent_block.prev_id = b.prev_id;
     parent_block.nonce = b.parent_block.nonce;
@@ -173,7 +178,7 @@ NAN_METHOD(address_decode) {
     Local<Object> target = info[0]->ToObject();
 
     if (!Buffer::HasInstance(target)) return THROW_ERROR_EXCEPTION("Argument should be a buffer object.");
-    
+
     blobdata input = std::string(Buffer::Data(target), Buffer::Length(target));
 
     blobdata data;
